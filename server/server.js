@@ -29,18 +29,22 @@ app.get('/', (req, res) => {
 
 app.post('/queryBy/Actor', async (req, res) => {
   const { userInput } = req.body;
+  let attachedQuery = '';
+  for (let i = 0; i < userInput.length; i++) {
+    attachedQuery += `?film dbp:starring "${userInput[i]}"@en.\n`;
+  }
 
   const query = `
       PREFIX dbo: <http://dbpedia.org/ontology/>
       PREFIX dbp: <http://dbpedia.org/property/>
-      SELECT ?film ?name
+      SELECT DISTINCT ?name
       WHERE {
         ?film a dbo:Film.
         ?film dbp:language "English"@en.
-        ?film dbp:starring "${userInput}"@en.
+        ${attachedQuery}
         ?film dbp:name ?name.
+        FILTER (?name != ""@en)
       }
-      LIMIT 20
     `;
 
   const sparql_query = SPARQLManipulation(query);
@@ -48,7 +52,6 @@ app.post('/queryBy/Actor', async (req, res) => {
     params: { query: sparql_query },
     headers: { Accept: 'application/sparql-results+json' },
   });
-  console.log(response.data.results.bindings);
   res.json(response.data.results.bindings);
 });
 
@@ -58,11 +61,12 @@ app.post('/queryBy/Director', async (req, res) => {
   const query = `
     PREFIX dbo: <http://dbpedia.org/ontology/>
     PREFIX dbp: <http://dbpedia.org/property/>
-    SELECT ?film ?name
+    SELECT DISTINCT ?name
     WHERE {
       ?film a dbo:Film.
       ?film dbp:director "${userInput}"@en.
       ?film dbp:name ?name.
+      FILTER (?name != ""@en)
   }
   `;
 
@@ -80,11 +84,70 @@ app.post('/queryBy/Genre', async (req, res) => {
   const query = `
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/property/>
-  SELECT ?film ?name
+  SELECT DISTINCT ?name
   WHERE {
     ?film a dbo:Film.
     ?film dbp:genre "${userInput}"@en.
     ?film dbp:name ?name.
+    FILTER (?name != ""@en)
+  }
+  `;
+
+  const sparql_query = SPARQLManipulation(query);
+  const response = await axios.get(endpoint, {
+    params: { query: sparql_query },
+    headers: { Accept: 'application/sparql-results+json' },
+  });
+  res.json(response.data.results.bindings);
+});
+
+app.post('/queryBy/Title', async (req, res) => {
+  const { userInput } = req.body;
+  const query = `
+  PREFIX dbo: <http://dbpedia.org/ontology/>
+  PREFIX dbp: <http://dbpedia.org/property/>
+  SELECT DISTINCT ?name
+  WHERE {
+    ?film a dbo:Film.
+    ?film dbp:language "English"@en.
+    ?film dbp:name "${userInput}"@en.
+    ?film dbp:director ?director.
+
+    ?otherFilm a dbo:Film.
+    ?otherFilm dbp:language "English"@en.
+    ?otherFilm dbp:name ?name.
+    ?otherFilm dbp:director ?director.
+
+    FILTER (?name != "${userInput}"@en)
+  }
+  `;
+
+  const sparql_query = SPARQLManipulation(query);
+  const response = await axios.get(endpoint, {
+    params: { query: sparql_query },
+    headers: { Accept: 'application/sparql-results+json' },
+  });
+  res.json(response.data.results.bindings);
+});
+
+app.post('/queryBy/releasedYear', async (req, res) => {
+  const { userInput } = req.body;
+  let filter;
+  if (Array.isArray(userInput)) {
+    filter = `FILTER (YEAR(?year) >= ${userInput[0]} && YEAR(?year) <= ${userInput[1]})`;
+  } else {
+    filter = `FILTER (YEAR(?year) = ${userInput})`;
+  }
+  const query = `
+  PREFIX dbo: <http://dbpedia.org/ontology/>
+  PREFIX dbp: <http://dbpedia.org/property/>
+  SELECT DISTINCT ?name
+  WHERE {
+    ?film a dbo:Film.
+    ?film dbp:language "English"@en.
+    ?film dbp:name ?name.
+    ?film dbo:releaseDate ?year.
+    ${filter}
   }
   `;
 
