@@ -159,6 +159,28 @@ app.post('/queryBy/releasedYear', async (req, res) => {
   res.json(response.data.results.bindings);
 });
 
+app.post('/queryBy/Language', async (req, res) => {
+  const { userInput } = req.body;
+  const query = `
+  PREFIX dbo: <http://dbpedia.org/ontology/>
+  PREFIX dbp: <http://dbpedia.org/property/>
+  SELECT DISTINCT ?name
+  WHERE {
+    ?film a dbo:Film.
+    ?film dbp:language "${userInput}"@en.
+    ?film dbp:name ?name.
+    FILTER (?name != ""@en)
+  }
+  `;
+
+  const sparql_query = SPARQLManipulation(query);
+  const response = await axios.get(endpoint, {
+    params: { query: sparql_query },
+    headers: { Accept: 'application/sparql-results+json' },
+  });
+  res.json(response.data.results.bindings);
+});
+
 function SPARQLManipulation(query) {
   return generator.stringify(parser.parse(query));
 }
