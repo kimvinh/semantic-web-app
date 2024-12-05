@@ -46,6 +46,8 @@ function App() {
       setInputInstruction('E.g., Inception, Life of Pi, ...');
     } else if (e.target.value === 'releasedYear') {
       setInputInstruction('E.g., 2022, 2010-2023, ...');
+    } else if (e.target.value === 'Language') {
+      setInputInstruction('E.g., English, French, Japanese, ...');
     }
   };
 
@@ -162,6 +164,21 @@ function App() {
               htmlFor="releasedYear"
             >
               Released Year
+            </label>
+          </span>
+          <span>
+            <input
+              type="radio"
+              id="Language"
+              value="Language"
+              checked={queryType === 'Language'}
+              onChange={handleChange}
+            />
+            <label
+              className="text-indigo-400 text-lg pl-1"
+              htmlFor="Language"
+            >
+              Language
             </label>
           </span>
         </div>
