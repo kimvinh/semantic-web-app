@@ -37,12 +37,13 @@ app.post('/queryBy/Actor', async (req, res) => {
   const query = `
       PREFIX dbo: <http://dbpedia.org/ontology/>
       PREFIX dbp: <http://dbpedia.org/property/>
-      SELECT DISTINCT ?name
+      SELECT DISTINCT ?name ?gross
       WHERE {
         ?film a dbo:Film.
         ?film dbp:language "English"@en.
         ${attachedQuery}
         ?film dbp:name ?name.
+        OPTIONAL {?film dbp:gross ?gross}.
         FILTER (?name != ""@en)
       }
     `;
@@ -61,11 +62,12 @@ app.post('/queryBy/Director', async (req, res) => {
   const query = `
     PREFIX dbo: <http://dbpedia.org/ontology/>
     PREFIX dbp: <http://dbpedia.org/property/>
-    SELECT DISTINCT ?name
+    SELECT DISTINCT ?name ?gross
     WHERE {
       ?film a dbo:Film.
       ?film dbp:director "${userInput}"@en.
       ?film dbp:name ?name.
+      OPTIONAL {?film dbp:gross ?gross}.
       FILTER (?name != ""@en)
   }
   `;
@@ -84,11 +86,12 @@ app.post('/queryBy/Genre', async (req, res) => {
   const query = `
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/property/>
-  SELECT DISTINCT ?name
+  SELECT DISTINCT ?name ?gross
   WHERE {
     ?film a dbo:Film.
     ?film dbp:genre "${userInput}"@en.
     ?film dbp:name ?name.
+    OPTIONAL {?film dbp:gross ?gross}.
     FILTER (?name != ""@en)
   }
   `;
@@ -106,7 +109,7 @@ app.post('/queryBy/Title', async (req, res) => {
   const query = `
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/property/>
-  SELECT DISTINCT ?name
+  SELECT DISTINCT ?name ?gross
   WHERE {
     ?film a dbo:Film.
     ?film dbp:language "English"@en.
@@ -117,8 +120,10 @@ app.post('/queryBy/Title', async (req, res) => {
     ?otherFilm dbp:language "English"@en.
     ?otherFilm dbp:name ?name.
     ?otherFilm dbp:director ?director.
+    OPTIONAL {?otherFilm dbp:gross ?gross}.
 
     FILTER (?name != "${userInput}"@en)
+    FILTER (?name != ""@en)
   }
   `;
 
@@ -141,13 +146,15 @@ app.post('/queryBy/releasedYear', async (req, res) => {
   const query = `
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/property/>
-  SELECT DISTINCT ?name
+  SELECT DISTINCT ?name ?gross
   WHERE {
     ?film a dbo:Film.
     ?film dbp:language "English"@en.
     ?film dbp:name ?name.
     ?film dbo:releaseDate ?year.
+    OPTIONAL {?film dbp:gross ?gross}.
     ${filter}
+    FILTER (?name != ""@en)
   }
   `;
 
@@ -164,11 +171,12 @@ app.post('/queryBy/Language', async (req, res) => {
   const query = `
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/property/>
-  SELECT DISTINCT ?name
+  SELECT DISTINCT ?name ?gross
   WHERE {
     ?film a dbo:Film.
     ?film dbp:language "${userInput}"@en.
     ?film dbp:name ?name.
+    OPTIONAL {?film dbp:gross ?gross}.
     FILTER (?name != ""@en)
   }
   `;
