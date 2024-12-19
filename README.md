@@ -1,3 +1,8 @@
+# CPSC 583 Final Project
+Team Members:
+1. Vinh Tran
+2. Neema Tabarani
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
