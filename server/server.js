@@ -34,6 +34,7 @@ app.post('/queryBy/Actor', async (req, res) => {
     attachedQuery += `?film dbp:starring "${userInput[i]}"@en.\n`;
   }
 
+  // List all of films and their gross income starred by actors' name based on the user's input
   const query = `
       PREFIX dbo: <http://dbpedia.org/ontology/>
       PREFIX dbp: <http://dbpedia.org/property/>
@@ -59,6 +60,7 @@ app.post('/queryBy/Actor', async (req, res) => {
 app.post('/queryBy/Director', async (req, res) => {
   const { userInput } = req.body;
 
+  // List all of films and their gross income based on the director's name based on the user's input
   const query = `
     PREFIX dbo: <http://dbpedia.org/ontology/>
     PREFIX dbp: <http://dbpedia.org/property/>
@@ -83,6 +85,7 @@ app.post('/queryBy/Director', async (req, res) => {
 app.post('/queryBy/Genre', async (req, res) => {
   const { userInput } = req.body;
 
+  // List all of films and their gross income based on genre from the user's input
   const query = `
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX dbp: <http://dbpedia.org/property/>
@@ -104,6 +107,7 @@ app.post('/queryBy/Genre', async (req, res) => {
   res.json(response.data.results.bindings);
 });
 
+// List all of films and their gross income that have the same director based on the title film from the user's input
 app.post('/queryBy/Title', async (req, res) => {
   const { userInput } = req.body;
   const query = `
@@ -135,6 +139,7 @@ app.post('/queryBy/Title', async (req, res) => {
   res.json(response.data.results.bindings);
 });
 
+// List all of films and their gross income based on the released year from the user's input
 app.post('/queryBy/releasedYear', async (req, res) => {
   const { userInput } = req.body;
   let filter;
@@ -166,6 +171,7 @@ app.post('/queryBy/releasedYear', async (req, res) => {
   res.json(response.data.results.bindings);
 });
 
+// List all of films and their gross income based on the language from the user's input
 app.post('/queryBy/Language', async (req, res) => {
   const { userInput } = req.body;
   const query = `
@@ -189,6 +195,7 @@ app.post('/queryBy/Language', async (req, res) => {
   res.json(response.data.results.bindings);
 });
 
+// Parse the query string and create the correct format SPARQL queries
 function SPARQLManipulation(query) {
   return generator.stringify(parser.parse(query));
 }

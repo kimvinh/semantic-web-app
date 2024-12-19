@@ -14,18 +14,22 @@ function App() {
   const [filmData, setFilmData] = useState();
   const inputRef = useRef(null);
 
+  // The input will be focused after the page is loaded
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
 
+  // Send the request to the server when the user press 'Enter'
   const handleKeyPressed = (e) => {
     if (e.key === 'Enter') {
       handleClick();
     }
   };
 
+  // Check and handle user's input
+  // Then send the request to the server
   const handleClick = () => {
     if (userInput !== '') {
       let processedInput = userInput;
@@ -44,6 +48,7 @@ function App() {
     }
   };
 
+  // Show the appropriate text based on the change of radio buttons
   const handleChange = (e) => {
     setUserInput('');
     setQueryType(e.target.value);
@@ -64,6 +69,7 @@ function App() {
     }
   };
 
+  // Rank the data based on the gross income
   const handleRank = (data, rank) => {
     if (data.gross && rank === 0) {
       return (
@@ -138,6 +144,8 @@ function App() {
     }
   };
 
+  // Send the request to the server
+  // Filter the data returned by the server
   const sendQuery = async (userInput) => {
     const response = await axios.post(
       `http://localhost:3001/queryBy/${queryType}`,
@@ -145,6 +153,8 @@ function App() {
         userInput,
       }
     );
+
+    // Filter the data returned by the server
     let changedData = response.data;
     if (changedData.length) {
       let filteredDataWithGross = changedData.filter((film) => film.gross);
